@@ -59,3 +59,27 @@ async def upload_file(
     status_upload = documents(description, file)
     return {"status": status_upload}
 
+
+# --- Mock Authentication endpoints for Streamlit frontend ---
+
+@router.post("/api/init")
+async def api_init():
+    """Mock init endpoint for Streamlit."""
+    return {"api_token": "mock_api_token_123"}
+
+from pydantic import BaseModel
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+@router.post("/api/create_user")
+async def api_create_user(req: AuthRequest):
+    """Mock create user endpoint."""
+    return {"status": "success", "message": "User created successfully"}
+
+@router.post("/api/login")
+async def api_login(req: AuthRequest):
+    """Mock login endpoint."""
+    return {"jwt": "mock_jwt_token_456"}
+

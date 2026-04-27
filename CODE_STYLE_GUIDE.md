@@ -305,9 +305,8 @@ Consider caching for expensive operations:
 from functools import lru_cache
 
 @lru_cache(maxsize=128)
-def get_embedding_model():
-    """Get embedding model (cached)."""
-    return OpenAIEmbeddings()
+def get_embeddings() -> HuggingFaceEmbeddings:
+    return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 ```
 
 ## Code Review Checklist

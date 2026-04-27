@@ -21,15 +21,12 @@ prompts:
     
     Your task is to classify the question into exactly one of these three categories:
     
-    1. "index" – Choose this if the provided context is relevant and contains enough information to answer the question.
-    2. "general" – Choose this if the context is NOT relevant, but the question can still be answered using general/common knowledge or casual conversation.
-    3. "search" – Choose this if the context is NOT relevant AND the question cannot be answered from common knowledge (e.g., requires real-time information, niche facts, or external lookup).
+    1. "index" – Choose this if the user is asking about the uploaded document, the project, or the provided context. EVEN IF the context is not a perfect match, if the user says "explain this project", "summarize", or "what is this document", ALWAYS choose "index".
+    2. "general" – Choose this ONLY if the question is a casual greeting like "hi" or general world knowledge completely unrelated to any uploaded document.
+    3. "search" – Choose this ONLY if the question requires real-time information, niche facts, or external lookup.
     
     Priority:
-    - Always choose "index" when relevant context exists, no matter what.
-    - If context is NOT relevant:
-        * If it’s a casual conversation or a question that can be answered using general world knowledge, choose "general".
-        * Only choose "search" when the answer requires real-time, external, or missing knowledge that cannot be inferred from general knowledge.
+    - If the user references "this document", "explain", "summarize", or "project", choose "index".
     
     ---
     Question: {question}

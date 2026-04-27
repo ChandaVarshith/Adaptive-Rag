@@ -64,12 +64,9 @@ def documents(description: str, file: UploadFile = File(...)):
     finally:
         os.unlink(tmp_path)
 
-    # Enhance description using LLM
-    description_llm = enhance_description_with_llm(description)
-
-    # Save enhanced description
+    # Save raw description directly so the agents understand it
     with open("description.txt", "w", encoding="utf-8") as f:
-        f.write(description_llm)
+        f.write(description)
 
     with open("description.txt", "r", encoding="utf-8") as f:
         print("Document description from storage:")

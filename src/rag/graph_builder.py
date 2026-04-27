@@ -8,10 +8,10 @@ from langchain_core.prompts import PromptTemplate
 from langgraph.constants import START, END
 from langgraph.graph.state import StateGraph
 
-from src.rag.reAct_agent import agent_executor
+from src.rag.reAct_agent import get_agent_executor
 from src.rag.retriever_setup import get_retriever
 from src.config.settings import Config
-from src.llms.openai import llm
+from src.llms.groq_llm import llm
 from src.models.grade import Grade
 from src.models.route_identifier import RouteIdentifier
 from src.models.state import State
@@ -21,20 +21,23 @@ config = Config()
 
 
 # Node implementations
+import os
+
 def query_classifier(state: State):
     """
     Classify the query to determine if it's related to indexed documents.
-
-    Args:
-        state (State): The current state of the graph.
-
-    Returns:
-        dict: Updated state with route and latest_query.
     """
     question = state["messages"][-1].content
     retriever = get_retriever()
     context = retriever.invoke(question)
-    print("docs received from Qdrant")
+    
+    # Append the overall document description to help classifier
+    if os.path.exists("description.txt"):
+        with open("description.txt", "r", encoding="utf-8") as f:
+            desc = f.read()
+            context += f"\n\n[Document Description: {desc}]"
+
+    print("docs received from Qdrant/FAISS")
     print(context)
 
     llm_with_structured_output = llm.with_structured_output(RouteIdentifier)
@@ -53,14 +56,15 @@ def query_classifier(state: State):
 def general_llm(state: State):
     """
     Fetch general common knowledge result from the LLM.
-
-    Args:
-        state (State): The current state of the graph.
-
-    Returns:
-        dict: Updated messages from LLM.
     """
-    result = llm.invoke(state["messages"])
+    messages = state["messages"].copy()
+    if os.path.exists("description.txt"):
+        with open("description.txt", "r", encoding="utf-8") as f:
+            desc = f.read()
+            from langchain_core.messages import SystemMessage
+            messages.insert(0, SystemMessage(content=f"The user has uploaded a document described as: {desc}. Answer the user politely."))
+
+    result = llm.invoke(messages)
     print("inside general llm")
     print(result)
     return {"messages": result}
@@ -77,6 +81,7 @@ def retriever_node(state: State):
         dict: Updated messages with tool calls.
     """
     messages = state["latest_query"]
+    agent_executor = get_agent_executor()
     result = agent_executor.invoke({"input": messages})
 
     # Extract tool calls
@@ -144,8 +149,10 @@ def rewrite_query(state: State):
     result = chain.invoke({"query": query})
     print(result)
 
+    rewrites = state.get("rewrite_count", 0) or 0
     return {
-        "latest_query": result.content
+        "latest_query": result.content,
+        "rewrite_count": rewrites + 1
     }
 
 

@@ -10,7 +10,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 # Backend service URLs
-RUST_BASE_URL = "http://localhost:8080/api"
+RUST_BASE_URL = "http://localhost:8000/api"
 PYTHON_BASE_URL = "http://127.0.0.1:8000"
 
 

@@ -152,10 +152,11 @@ Results returned to user
 - Is NOT used for actual queries (only for initialization)
 
 ### ✅ **What Happens When You Upload Documents**
-- Your document is loaded from file
-- Split into chunks (1000 char, 150 overlap)
-- Embedded using OpenAI embeddings
-- **Stored in FAISS vectorstore** via `retriever_chain()`
+4. **Retrieval Chain Injection**: 
+   - Receives complete `Document` array
+   - Split chunks mapped to Qdrant/FAISS database
+   - Embedded using HuggingFace local embeddings
+   - Database persisted internally FAISS vectorstore** via `retriever_chain()`
 - Available immediately for searches
 
 ### ✅ **What Happens When You Query**

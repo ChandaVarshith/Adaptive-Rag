@@ -1,2 +1,46 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ─── Virtual Environments ─────────────────────────────────────────────────────
+.venv/
 venv/
+env/
+ENV/
+
+# ─── Environment Variables ────────────────────────────────────────────────────
 .env
+.env.*
+!.env.example
+
+# ─── IDE / Editor ─────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ─── Logs & Runtime ───────────────────────────────────────────────────────────
+app.log
+*.log
+logs/
+
+# ─── Data & Uploads ───────────────────────────────────────────────────────────
+uploads/
+data/
+*.faiss
+*.pkl
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

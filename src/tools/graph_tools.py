@@ -7,7 +7,7 @@ from typing import Literal
 from langchain_core.prompts import PromptTemplate
 
 from src.config.settings import Config
-from src.llms.openai import llm
+from src.llms.groq_llm import llm
 from src.models.state import State
 from src.models.verification_result import VerificationResult
 
@@ -35,16 +35,22 @@ def routing_tool(state: State) -> Literal["retriever", "general_llm", "web_searc
 def doc_tool(state: State) -> Literal["rewrite", "generate"]:
     """
     Determine whether the query needs rewriting based on grading score.
+    Limits rewrites to 3 times to prevent infinite loops.
 
     Args:
         state (State): The current state of the graph.
 
     Returns:
-        The next node: "generate" if score is "yes", otherwise "rewrite".
+        The next node: "generate" if score is "yes" or max rewrites reached, otherwise "rewrite".
     """
-    score = state["binary_score"]
-    print(f"[doc_tool] Routing based on score: {score}")
-    if score == "yes":
+    score = state.get("binary_score")
+    rewrites = state.get("rewrite_count", 0) or 0
+    
+    print(f"[doc_tool] Routing based on score: {score}, rewrite_count: {rewrites}")
+    
+    if score == "yes" or rewrites >= 3:
+        if rewrites >= 3:
+            print("[doc_tool] Max rewrites reached, forcing generation.")
         return "generate"
     else:
         return "rewrite"
