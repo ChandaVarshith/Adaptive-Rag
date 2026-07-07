@@ -204,5 +204,4 @@ Content-Type: application/json
 ---
 
 ## 👤 Author
-*   **Dhruv Singhal** — GitHub: [@dhruvsinghal09](https://github.com/dhruvsinghal09)
-*   **Fork Maintainer**: [@ChandaVarshith](https://github.com/ChandaVarshith)
+*   **Varshith Chanda** — GitHub: [@ChandaVarshith](https://github.com/ChandaVarshith)
