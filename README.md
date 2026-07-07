@@ -3,7 +3,7 @@
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green.svg)](https://fastapi.tiangolo.com/)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.5.4-orange.svg)](https://python.langchain.com/langgraph/)
-[![Qdrant](https://img.shields.io/badge/Qdrant-VectorDB-purple.svg)](https://qdrant.tech/)
+[![FAISS](https://img.shields.io/badge/FAISS-VectorDB-blue.svg)](https://github.com/facebookresearch/faiss)
 
 ## 📋 Overview
 
@@ -24,7 +24,7 @@ The system intelligently adapts its retrieval strategy based on query type, util
 
 ### 📚 Advanced RAG Pipeline
 - **Document Processing**: Intelligent chunking and embedding of documents
-- **Vector Search**: Fast similarity-based retrieval using Qdrant
+- **Vector Search**: Fast similarity-based retrieval using FAISS (Facebook AI Similarity Search)
 - **Relevance Grading**: Automatic evaluation of retrieved documents
 - **Query Rewriting**: Optimizes queries for better retrieval results
 
@@ -248,7 +248,7 @@ Form Data:
 # System Requirements
 - Python 3.9 or higher
 - MongoDB (local or cloud)
-- Qdrant vector database
+- FAISS (in-memory vector database)
 - OpenAI API key
 - Tavily API key (for web search)
 ```
@@ -279,11 +279,8 @@ OPENAI_API_KEY=your_openai_api_key_here
 # Tavily Search Configuration
 TAVILY_API_KEY=your_tavily_api_key_here
 
-# Qdrant Configuration
-QDRANT_URL=http://localhost:6333
-QDRANT_API_KEY=your_qdrant_api_key
-QDRANT_CODE_COLLECTION=code_documents
-QDRANT_DOCS_COLLECTION=documents
+# Vector Store Configuration
+# The system uses FAISS as an in-memory vector database, so no external credentials are required.
 
 # MongoDB Configuration
 MONGODB_URL=mongodb://localhost:27017
@@ -359,8 +356,6 @@ print(response.json())
 # Core application settings loaded from environment
 OPENAI_API_KEY           # OpenAI API authentication
 TAVILY_API_KEY          # Web search functionality
-QDRANT_URL              # Vector database endpoint
-QDRANT_API_KEY          # Vector database authentication
 MONGODB_URL             # Chat history database
 ```
 
@@ -457,7 +452,7 @@ Create `Dockerfile` and `docker-compose.yml` for containerized deployment.
 ## 📊 Performance Optimization
 
 - **Document Chunking**: Configurable chunk size (1000 chars, 150 overlap)
-- **Vector Search**: Efficient similarity search with Qdrant
+- **Vector Search**: Efficient similarity search with FAISS (in-memory)
 - **Async Operations**: Non-blocking I/O for better throughput
 - **Caching**: Query results cached when applicable
 - **Batch Processing**: Document processing in batches
@@ -493,7 +488,7 @@ Contributions are welcome! Please follow these steps:
 | **Web Framework** | FastAPI | Latest |
 | **ASGI Server** | Uvicorn | Latest |
 | **UI Framework** | Streamlit | Latest |
-| **Vector Database** | Qdrant/FAISS | Latest |
+| **Vector Database** | FAISS | Latest |
 | **Chat Database** | MongoDB/InMemory | Latest |
 | **Document Processing** | LangChain Community | ~0.3.27 |
 | **LLM Provider** | OpenAI | ~0.3.28 |
@@ -519,7 +514,7 @@ Contributions are welcome! Please follow these steps:
 A: Upload one document at a time through the Streamlit interface. Each upload creates a new indexed collection.
 
 **Q: What's the maximum file size?**  
-A: Limited by system memory and Qdrant storage. Typical limit is 100MB per file.
+A: Limited by system memory. Typical limit is 100MB per file.
 
 **Q: Can I use different LLM providers?**  
 A: Currently configured for OpenAI. You can modify `src/llms/openai.py` to use other providers.
@@ -544,7 +539,7 @@ For issues, questions, or suggestions:
 ## 🙏 Acknowledgments
 
 - Built with LangChain and LangGraph
-- Vector search powered by Qdrant
+- Vector search powered by FAISS
 - LLM capabilities by OpenAI
 - Web search by Tavily
 - UI powered by Streamlit

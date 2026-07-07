@@ -7,7 +7,6 @@ import os
 from langchain_core.documents import Document
 from langchain_core.tools import create_retriever_tool
 from langchain_openai import OpenAIEmbeddings
-# from langchain_qdrant import QdrantVectorStore
 from langchain_community.vectorstores import FAISS
 
 from src.core.config import settings
@@ -32,14 +31,6 @@ def retriever_chain(chunks: list[Document]):
     global _faiss_vectorstore
 
     try:
-        # Commenting out Qdrant code for temporary FAISS usage
-        # vectorstore = QdrantVectorStore.from_documents(
-        #     documents=chunks,
-        #     embedding=embeddings,
-        #     url=settings.QDRANT_URL,
-        #     api_key=settings.QDRANT_API_KEY,
-        #     collection_name=settings.CODE_COLLECTION,
-        # )
         vectorstore = FAISS.from_documents(
             documents=chunks,
             embedding=embeddings
@@ -72,16 +63,6 @@ def get_retriever():
     global _faiss_vectorstore
 
     try:
-        # Commenting out Qdrant code for temporary FAISS usage
-        # vectorstore = QdrantVectorStore.from_documents(
-        #     documents=[],
-        #     embedding=embeddings,
-        #     url=settings.QDRANT_URL,
-        #     api_key=settings.QDRANT_API_KEY,
-        #     collection_name=settings.CODE_COLLECTION,
-        # )
-        # retriever = vectorstore.as_retriever()
-
         # Use the global vectorstore if it exists (documents have been uploaded)
         if _faiss_vectorstore is not None:
             retriever = _faiss_vectorstore.as_retriever()

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive RAG: End-to-End Project Overview & Parameters</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #bc8cff;
+            --accent-yellow: #e3b341;
+            --accent-red: #ff7b72;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 2rem 5%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: white;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .flow-container {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-purple);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 0 20px rgba(188, 140, 255, 0.1);
+        }
+
+        .flow-step {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .flow-step h3 {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-card h3 {
+            color: var(--accent-green);
+            margin-top: 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tech-section {
+            margin-bottom: 1rem;
+        }
+        
+        .tech-title {
+            font-weight: 600;
+            color: #a5d6ff;
+        }
+
+        /* Parameter Highlighting */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: #010409;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .param-table th, .param-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .param-table th {
+            background: #1f2428;
+            color: var(--accent-yellow);
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
+        }
+        
+        .param-table td {
+            font-size: 0.95rem;
+        }
+        
+        .param-name {
+            color: var(--accent-red);
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
+        }
+        
+        .param-val {
+            color: var(--accent-blue);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .why-box {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .why-only-box {
+            background: rgba(255, 123, 114, 0.05);
+            border-left: 4px solid var(--accent-red);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🧠 Adaptive RAG: Complete Project Overview & Parameters Guide</h1>
+
+    <div class="flow-container">
+        <h2 style="margin-top: 0; border: none; color: var(--accent-purple);">🔄 Full End-to-End Project Flow</h2>
+        <p style="color: #8b949e; margin-bottom: 2rem;">This is the exact sequence of events that happens when the application runs.</p>
+        
+        <div class="flow-step">
+            <h3>1. Application Startup</h3>
+            <p>FastAPI boots up using Uvicorn (an ASGI server). The OpenAI LLM (gpt-4o), OpenAI Embeddings, and the asynchronous MongoDB connection are initialized into memory.</p>
+        </div>
+        
+        <div class="flow-step">
+            <h3>2. Document Upload Phase</h3>
+            <p>User uploads a PDF via Streamlit. Streamlit sends a POST request to FastAPI. FastAPI temporarily saves the file, chunks the text, creates vector embeddings for each chunk, and stores them in the in-memory FAISS vector database.</p>
+        </div>
+
+        <div class="flow-step">
+            <h3>3. User Query Phase</h3>
+            <p>User asks a question. Streamlit sends the query to FastAPI. FastAPI saves the Human Message to MongoDB asynchronously. The query is then passed into the <strong>LangGraph Orchestrator</strong>.</p>
+        </div>
+
+        <div class="flow-step">
+            <h3>4. LangGraph Routing (The "Adaptive" part)</h3>
+            <p>The first node in LangGraph is the <code>query_analysis</code> node. The LLM reads the question and strictly outputs a route: "index" (search documents), "search" (search web), or "general" (normal chat).</p>
+        </div>
+
+        <div class="flow-step">
+            <h3>5. Retrieval & ReAct Execution</h3>
+            <p>If the route is "index", the graph moves to the <code>retriever_node</code>. Here, a ReAct Agent uses the FAISS retriever tool to autonomously search the database, adjusting its search terms until it finds the best context.</p>
+        </div>
+
+        <div class="flow-step">
+            <h3>6. Grading & Rewriting Loop</h3>
+            <p>The retrieved context goes to the <code>grade</code> node. An LLM grades it "yes" or "no". If "no" (context is irrelevant), the graph loops backward to a <code>rewrite_query</code> node to try searching again. If "yes", it moves forward.</p>
+        </div>
+
+        <div class="flow-step">
+            <h3>7. Generation & Response</h3>
+            <p>The context reaches the <code>generate</code> node, where the LLM writes the final answer. FastAPI saves this AI Message to MongoDB and returns it to Streamlit to display to the user.</p>
+        </div>
+    </div>
+
+
+    <h2>🛠️ Tech Stack & Exact Parameters Deep Dive</h2>
+    <p>Memorize these parameters. Interviewers love asking <em>"What chunk size did you use?"</em> or <em>"How many iterations did you limit the agent to?"</em> to prove you actually wrote the code.</p>
+
+    <!-- 1. FastAPI -->
+    <div class="tech-card">
+        <h3>1. FastAPI (Web Framework)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> FastAPI and Uvicorn.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> Acts as the backend API layer to receive requests from Streamlit and run LangGraph.</div>
+        
+        <div class="why-box">
+            <strong>Why it is used:</strong> Native support for asynchronous programming (<code>async def</code>), which is critical for preventing server freezes while waiting for OpenAI or MongoDB. It also provides automatic Pydantic validation.
+        </div>
+        
+        <div class="why-only-box">
+            <strong>Why ONLY this (Alternatives):</strong> We rejected Flask/Django because they are WSGI (synchronous by default) and handle high-latency I/O (like LLM API calls) poorly without complex multi-threading setups.
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">file: UploadFile</span> = <span class="param-val">File(...)</span></td>
+                <td>FastAPI <code>UploadFile</code> class</td>
+                <td>Used instead of raw <code>bytes</code> because <code>UploadFile</code> writes to a temporary disk file if the PDF is large, preventing the server from running out of RAM (OOM errors).</td>
+            </tr>
+            <tr>
+                <td><span class="param-name">alias</span>=<span class="param-val">"X-Description"</span></td>
+                <td>HTTP Header Binding</td>
+                <td>Used in <code>Header(..., alias="X-Description")</code> to accept document descriptions via HTTP headers, keeping file uploads separate from JSON payloads.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 2. Text Splitter -->
+    <div class="tech-card">
+        <h3>2. RecursiveCharacterTextSplitter (Document Chunking)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> LangChain's RecursiveCharacterTextSplitter.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> Breaks massive 100-page PDFs into small paragraphs before vectorization.</div>
+        
+        <div class="why-box">
+            <strong>Why it is used:</strong> LLMs have strict context window limits. You cannot feed an entire book into an LLM. We must chunk it.
+        </div>
+        
+        <div class="why-only-box">
+            <strong>Why ONLY this (Alternatives):</strong> We rejected <code>CharacterTextSplitter</code> (which just splits by raw characters) because it chops words and sentences in half. The <em>Recursive</em> splitter tries to split by paragraphs (<code>\n\n</code>), then sentences (<code>.</code>), keeping semantic meaning intact.
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">chunk_size</span></td>
+                <td><span class="param-val">1000</span> (characters)</td>
+                <td>1000 characters (approx 200-250 words) is the sweet spot. Too large = too much noise for the LLM. Too small = not enough context to answer a question.</td>
+            </tr>
+            <tr>
+                <td><span class="param-name">chunk_overlap</span></td>
+                <td><span class="param-val">150</span> (characters)</td>
+                <td>Critical parameter! If a sentence is split perfectly in the middle between Chunk 1 and Chunk 2, the meaning is lost. 150 overlap means the last 150 chars of Chunk 1 are duplicated at the start of Chunk 2, preserving context across boundaries.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 3. FAISS -->
+    <div class="tech-card">
+        <h3>3. FAISS (Vector Database)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> Facebook AI Similarity Search (FAISS) via <code>langchain_community</code>.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> Stores the 1536-dimensional embeddings and performs rapid mathematical similarity search to find relevant text chunks.</div>
+        
+        <div class="why-box">
+            <strong>Why it is used:</strong> It uses the HNSW (Hierarchical Navigable Small World) algorithm to search massive datasets in O(log N) time rather than comparing against every single document (O(N)).
+        </div>
+        
+        <div class="why-only-box">
+            <strong>Why ONLY this (Alternatives):</strong> While the config mentions Qdrant, the actual code uses FAISS. We chose FAISS over Qdrant, Pinecone, or PostgreSQL(pgvector) because FAISS runs 100% in-memory locally. It requires zero cloud database setup, zero network latency, and makes the project highly portable.
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">embedding</span></td>
+                <td><span class="param-val">OpenAIEmbeddings()</span></td>
+                <td>Passed into <code>FAISS.from_documents()</code>. Translates the text into OpenAI's dense vector space format so FAISS knows how to map the math.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 4. ReAct Agent -->
+    <div class="tech-card">
+        <h3>4. ReAct Agent (AgentExecutor)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> LangChain <code>create_react_agent</code> and <code>AgentExecutor</code>.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> Acts as an autonomous brain that decides *what* to search for in FAISS based on the user's query.</div>
+        
+        <div class="why-box">
+            <strong>Why it is used:</strong> Standard RAG just takes the user's exact words and searches the DB. A ReAct agent reads the query, <em>Thinks</em> about what keywords to extract, <em>Acts</em> by calling the FAISS tool, and <em>Observes</em> the result.
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">max_iterations</span></td>
+                <td><span class="param-val">2</span></td>
+                <td>If the agent can't find the answer, it will keep retrying. Setting this to 2 prevents infinite loops and stops it from burning through OpenAI API credits.</td>
+            </tr>
+            <tr>
+                <td><span class="param-name">handle_parsing_errors</span></td>
+                <td><span class="param-val">True</span></td>
+                <td>If the LLM hallucinates an output format that breaks the agent's logic, this parameter catches the error and tells the LLM "You formatted that wrong, try again" instead of crashing the app.</td>
+            </tr>
+            <tr>
+                <td><span class="param-name">return_intermediate_steps</span></td>
+                <td><span class="param-val">True</span></td>
+                <td>Allows us to extract <em>exactly which tool the agent decided to call</em> and what input it used, which is saved to our state as <code>tool_calls</code> metadata for debugging.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 5. OpenAI LLM -->
+    <div class="tech-card">
+        <h3>5. OpenAI (LLM & Function Calling)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> <code>ChatOpenAI</code> from <code>langchain_openai</code>.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> The brain of the entire system (Routing, Grading, Rewriting, Generating).</div>
+
+        <div class="why-only-box">
+            <strong>Why ONLY this:</strong> OpenAI has the most reliable "Function Calling" (Structured Outputs) capabilities on the market. Open-source models (like Llama) often fail to adhere strictly to JSON schemas, which would break our LangGraph routing logic.
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">model</span></td>
+                <td><span class="param-val">"gpt-4o"</span></td>
+                <td>The flagship model. Chosen because its reasoning capabilities are required to accurately "grade" document relevance and act as a reliable router.</td>
+            </tr>
+            <tr>
+                <td><span class="param-name">.with_structured_output()</span></td>
+                <td><span class="param-val">RouteIdentifier</span> (Pydantic)</td>
+                <td>Forces the LLM to output a strict JSON object (e.g. <code>{"route": "index"}</code>) instead of conversational text. We pass our Pydantic classes (<code>RouteIdentifier</code>, <code>Grade</code>, <code>VerificationResult</code>) directly into this parameter.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 6. MongoDB -->
+    <div class="tech-card">
+        <h3>6. MongoDB & Motor (Database)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> <code>AsyncIOMotorClient</code> and a custom <code>BaseChatMessageHistory</code> class.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> Persists the conversation history across sessions.</div>
+        
+        <div class="why-box">
+            <strong>Why it is used:</strong> Chat messages are JSON-like objects (HumanMessage, AIMessage, tool metadata). MongoDB is a document NoSQL database that stores data as BSON (Binary JSON), making it a perfect 1:1 mapping for our data.
+        </div>
+        
+        <div class="why-only-box">
+            <strong>Why ONLY Motor (Alternatives):</strong> We absolutely could NOT use the standard <code>pymongo</code> library because it is synchronous. If we used PyMongo, writing chat history to the DB would block FastAPI's event loop. <code>motor.motor_asyncio</code> is fully asynchronous.
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">collection.find(...).sort()</span></td>
+                <td><span class="param-val">("timestamp", 1)</span></td>
+                <td>The <code>1</code> parameter in MongoDB sorting means "Ascending". This guarantees that when we pull chat history into the LLM context window, the oldest messages are first and the newest are last, maintaining timeline sanity.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 7. LangGraph -->
+    <div class="tech-card">
+        <h3>7. LangGraph (Orchestrator)</h3>
+        <div class="tech-section"><span class="tech-title">What is used:</span> <code>StateGraph</code>, Nodes, and Conditional Edges.</div>
+        <div class="tech-section"><span class="tech-title">What is the use:</span> Replaces linear code with a cyclical state machine.</div>
+        
+        <div class="why-only-box">
+            <strong>Why ONLY LangGraph (Alternatives):</strong> Standard LangChain <code>SequentialChain</code> or LCEL cannot loop backwards. If our grader decides the documents are bad, we need to loop backward to the rewrite node. LangGraph is the only framework that supports deterministic cyclical graphs (DAGs with cycles).
+        </div>
+
+        <table class="param-table">
+            <tr><th>Parameter / Code</th><th>Value / Definition</th><th>Why this exact parameter?</th></tr>
+            <tr>
+                <td><span class="param-name">State</span> (TypedDict)</td>
+                <td><code>messages: Annotated[list, add_messages]</code></td>
+                <td>We use <code>Annotated</code> to pass the <code>add_messages</code> reducer to LangGraph. This parameter is crucial: it tells the graph "When a node returns a new message, do NOT overwrite the existing message list. Append the new message to the list instead."</td>
+            </tr>
+            <tr>
+                <td><span class="param-name">graph.add_conditional_edges</span></td>
+                <td><span class="param-val">("query_analysis", routing_tool)</span></td>
+                <td>This parameter links the exit of the analysis node to a python function (<code>routing_tool</code>). That function reads the state and dynamically returns the name of the next node to execute.</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
